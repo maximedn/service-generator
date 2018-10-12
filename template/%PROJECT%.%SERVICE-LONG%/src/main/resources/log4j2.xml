@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="warn">
+    <properties>
+        <property name="PID">????</property>
+        <property name="LOG_EXCEPTION_CONVERSION_WORD">%xwEx</property>
+        <property name="LOG_LEVEL_PATTERN">%5p</property>
+        <property name="LOG_DATEFORMAT_PATTERN">yyyy-MM-dd HH:mm:ss.SSS</property>
+        <property name="CONSOLE_LOG_PATTERN">%clr{%d{${LOG_DATEFORMAT_PATTERN}}}{faint} %clr{${LOG_LEVEL_PATTERN}}%clr{${sys:PID}}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint}%m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}</property>
+        <property name="FILE_LOG_PATTERN">%d{${LOG_DATEFORMAT_PATTERN}} ${LOG_LEVEL_PATTERN} ${sys:PID} --- [%t]%-40.40c{1.} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}</property>
+    </properties>
+
+    <appenders>
+        <console name="Console" target="SYSTEM_OUT" follow="true">
+            <patternLayout pattern="${sys:CONSOLE_LOG_PATTERN}"/>
+        </console>
+
+        <rollingFile name="JsonFile" fileName="logs/%SERVICE-LONG%.json"
+                     filePattern="logs/%SERVICE-LONG%-%d{yyyy-MM-dd}-%i.json.gz">
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <JsonLayout complete="true" properties="true">
+            </JsonLayout>
+        </rollingFile>
+
+        <rollingFile name="File" fileName="logs/%SERVICE-LONG%.log"
+                     filePattern="logs/%SERVICE-LONG%-%d{yyyy-MM-dd}-%i.log.gz">
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <patternLayout pattern="${sys:FILE_LOG_PATTERN}"/>
+        </rollingFile>
+    </appenders>
+
+    <loggers>
+        <logger name="org.apache.catalina.startup.DigesterFactory" level="error"/>
+        <logger name="org.apache.catalina.util.LifecycleBase" level="error"/>
+        <logger name="org.apache.coyote.http11.Http11NioProtocol" level="warn"/>
+        <logger name="org.apache.sshd.common.util.SecurityUtils" level="warn"/>
+        <logger name="org.apache.tomcat.util.net.NioSelectorPool" level="warn"/>
+        <logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="error"/>
+        <logger name="org.hibernate.validator.internal.util.Version" level="warn"/>
+        <logger name="org.springframework.boot.actuate.endpoint.jmx" level="warn"/>
+
+        <root level="${env:LOG_LEVEL:-info}">
+            <appenderRef ref="Console"/>
+            <appenderRef ref="File"/>
+            <appenderRef ref="JsonFile"/>
+        </root>
+    </loggers>
+
+</configuration>

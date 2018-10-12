@@ -1,0 +1,59 @@
+#!groovy
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven 3.5.2'
+    }
+
+    stages {
+        stage('Build Project') {
+            steps {
+                sh 'rm -fr beapps.common-rest'
+                sh 'git clone git@fedict.plan.io:fedict/beapps.common-rest.git -b ' + scm.branches[0].name
+                sh 'mvn -DskipTests=true clean install -f beapps.common-rest/pom.xml'
+                sh 'mvn clean install site -Ddependency.locations.enabled=false -Pjenkins -f pom.xml'
+            }
+            post {
+                success {
+                    junit '**/target/surefire-reports/**/*.xml'
+                    step([
+                        $class: 'JacocoPublisher',
+                        execPattern: '**/target/**.exec',
+                        exclusionPattern: 'be/bosa/%PROJECT%/%SERVICE-LONG-1W%/api/model/**,**/*Application.*'
+                    ])
+                    publishHTML (target: [
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'target/site',
+                            reportFiles: 'index.html',
+                            reportName: "Maven Site Report"
+                    ])
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def pom = readMavenPom file: 'pom.xml'
+                    POM_VERSION = pom.version
+                }
+                sh "docker build -t devops.digital.belgium.be:1443/%PROJECT%-%SERVICE-LONG%%:${POM_VERSION}-b${BUILD_ID} --build-arg env=demo --build-arg JAR_FILE=target/%SERVICE-LONG%-${POM_VERSION}.jar ."
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    def pom = readMavenPom file: 'pom.xml'
+                    POM_VERSION = pom.version
+                }
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'azure-repository',
+                                  usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                    sh 'docker login -u $USERNAME -p $PASSWORD devops.digital.belgium.be:1443'
+                    sh "docker push devops.digital.belgium.be:1443/%PROJECT%-%SERVICE-LONG%:${POM_VERSION}-b${BUILD_ID}"
+                }
+            }
+        }
+    }
+}

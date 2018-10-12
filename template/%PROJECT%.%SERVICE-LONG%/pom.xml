@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>be.bosa.%PROJECT%</groupId>
+    <artifactId>%SERVICE-LONG%</artifactId>
+    <version>0.0.3-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>%SERVICE-LONG%</name>
+    <description>REST api for %PROJECT% student DS</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+
+        <jackson-jaxrs.version>2.8.9</jackson-jaxrs.version>
+        <swagger.version>1.5.20</swagger.version>
+
+        <rest-assured.version>3.1.0</rest-assured.version>
+        <jacoco-maven-plugin.version>0.8.1</jacoco-maven-plugin.version>
+        <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
+        <maven-project-info-reports-plugin.version>2.9</maven-project-info-reports-plugin.version>
+        <checkstyle.version>2.9.1</checkstyle.version>
+
+        <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- Cleans /logs folder when mvn clean'ing-->
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>logs</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <!-- Generate API spec (model and JAXRS interfaces) -->
+            <plugin>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>2.3.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/swagger/%SERVICE-LONG%.yaml</inputSpec>
+                            <language>jaxrs-spec</language>
+                            <configOptions>
+                                <apiPackage>be.bosa.%PROJECT%.%SERVICE-LONG-1W%.api</apiPackage>
+                                <modelPackage>be.bosa.%PROJECT%.%SERVICE-LONG-1W%.api.model</modelPackage>
+                                <configPackage>be.bosa.%PROJECT%.%SERVICE-LONG-1W%.api.config</configPackage>
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Build with swagger generated code as sources -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/swagger</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Spring Boot starters -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jersey</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jersey2-jaxrs</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${rest-assured.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>be.bosa.beapp</groupId>
+            <artifactId>common-rest</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+    <!-- Jenkins: coverage & static analysis -->
+    <profiles>
+        <profile>
+            <id>jenkins</id>
+            <activation>
+                <property>
+                    <name>env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Coverage -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco-maven-plugin.version}</version>
+                        <configuration>
+                            <excludes>
+                                <!-- exclude generated -->
+                                <exclude>be/bosa/%PROJECT%/%SERVICE-LONG-1W%/api/model/**</exclude>
+                                <!-- exclude starter class -->
+                                <exclude>**/*Application.*</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>pre-unit-tests</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <!--<configuration>-->
+                                <!--&lt;!&ndash; Sets the path to the file which contains the execution data. &ndash;&gt;-->
+                                <!--<destFile>${project.testresult.directory}/coverage/jacoco/jacoco.exec</destFile>-->
+                                <!--</configuration>-->
+                            </execution>
+                            <!-- Ensures that the code coverage report for unit tests is created after unit tests have been run -->
+                            <execution>
+                                <id>post-unit-test</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>${project.testresult.directory}/coverage/jacoco/jacoco.exec</dataFile>
+                                    <outputDirectory>${project.testresult.directory}/coverage/jacoco</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Analysis -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>${findbugs-maven-plugin.version}</version>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                            <threshold>Low</threshold>
+                            <xmlOutput>true</xmlOutput>
+                            <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>analyze-compile</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-report-plugin</artifactId>
+                        <version>2.22.0</version>
+                    </plugin>
+                    <!-- maven site plugin version has to be specified for compatibility with info-reports-plugin -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>${maven-site-plugin.version}</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <version>${maven-project-info-reports-plugin.version}</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco-maven-plugin.version}</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>${findbugs-maven-plugin.version}</version>
+                        <configuration>
+                            <xmlOutput>true</xmlOutput>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>${checkstyle.version}</version>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+    </profiles>
+
+</project>

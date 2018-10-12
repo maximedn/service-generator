@@ -1,0 +1,183 @@
+# Project: HCP
+# Module: QUE-DS-SER
+# Version: 1.0
+# Be aware that YAML has indentation based scoping
+swagger: '2.0'
+
+# Document metadata
+info:
+  description: Queue Domain Service
+  version: "1.0.0"
+  title: Queue Domain Service
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /event:
+    get:
+      summary: Retrieve the oldest Event.
+      description: Retrieve the oldest Event.
+      operationId: dequeue()
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: "#/definitions/Event"
+        404:
+          description: Not Found.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+    post:
+      parameters:
+        - in: body
+          name: event
+          description: The Event.
+          schema:
+            $ref: '#/definitions/EventRequestBody'
+      summary: Post an Event.
+      description: Post an Event.
+      operationId: postEvent()
+      responses:
+        200:
+          description: Successful response.
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+  /event/{eventId}:
+    delete:
+      parameters:
+        - name: eventId
+          in: path
+          description: Event Unique Identifier
+          type: string
+          required: true
+      summary: Delete the Event on given eventId.
+      description: Delete the Event on given eventId.
+      operationId: deleteEventByEventId()
+      responses:
+        200:
+          description: Successful response.
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        404:
+          description: Not Found.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+    put:
+      parameters:
+        - name: eventId
+          in: path
+          description: Event Unique Identifier
+          type: string
+          required: true
+        - in: body
+          name: eventAmendRequestBody
+          description: The Event Body.
+          schema:
+            $ref: '#/definitions/EventAmendRequestBody'
+      summary: Amend the Event on given eventId.
+      description: Amend the Event on given eventId.
+      operationId: amendEventByEventId()
+      responses:
+        200:
+          description: Successful response.
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        404:
+          description: Not Found.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+
+definitions:
+  Event:
+    type: object
+    properties:
+      eventId:
+        type: string
+        description: Event Unique Identifier as Primary Key.
+      uuid:
+        type: string
+        description: Event Name as Unique Identifier.
+      content:
+        type: string
+        description: Event Content.
+      creationTimestamp:
+        type: string
+        description: Creation Event Timestamp
+      updateTimestamp:
+        type: string
+        description: Update Event Timestamp
+      retryNumber:
+        type: integer
+        description: Event Retry Number
+
+  EventRequestBody:
+    type: object
+    properties:
+      uuid:
+        type: string
+        description: Event Name as Unique Identifier.
+
+  EventAmendRequestBody:
+    type: object
+    properties:
+      eventId:
+        type: string
+        description: Event Unique Identifier.
+
+  Problem:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: HTTP Code
+        format: int64
+      type:
+        type: string
+        description: Error message code
+        maxLength: 255
+      title:
+        type: string
+        description: Error Description
+        maxLength: 255

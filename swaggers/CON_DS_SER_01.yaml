@@ -1,0 +1,449 @@
+# Project: HCP
+# Module: CON-DS-SER
+# Version: 1.0
+# Be aware that YAML has indentation based scoping
+swagger: '2.0'
+
+# Document metadata
+info:
+  description: Content Domain Service
+  version: "1.0.0"
+  title: Content Domain Service
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /businessowners/{businessOwnerId}:
+    get:
+      parameters:
+        - name: businessOwnerId
+          in: path
+          description: Business Owner Unique Identifier
+          type: string
+          required: true
+      summary: Retrieve a Business Owner on given businessOwnerId.
+      description: Retrieve a Business Owner on given businessOwnerId.
+      operationId: getBusinessOwnerByBusinessOwnerId()
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: "#/definitions/BusinessOwner"
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        404:
+          description: Not Found.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+    delete:
+      parameters:
+        - name: businessOwnerId
+          in: path
+          description: Business Owner Unique Identifier
+          type: string
+          required: true
+      summary: Soft-deletion the Business Owner on given businessOwnerId.
+      description: Soft-deletion the Business Owner on given businessOwnerId.
+      operationId: softDeleteBusinessOwnerByBusinessOwnerId()
+      responses:
+        200:
+          description: Successful response.
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        404:
+          description: Not Found.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+    put:
+      parameters:
+        - name: businessOwnerId
+          in: path
+          description: Business Owner Unique Identifier
+          type: string
+          required: true
+        - in: body
+          name: businessOwner
+          description: The Business Owner Body.
+          schema:
+            $ref: '#/definitions/BusinessOwnerAmendBody'
+      summary: Amend a Business Owner on given businessOwnerId.
+      description: Amend a Business Owner on given businessOwnerId.
+      operationId: amendBusinessOwnerByBusinessOwnerId()
+      responses:
+        200:
+          description: Successful response.
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        404:
+          description: Not Found.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+  /businessowners:
+    post:
+      parameters:
+        - in: body
+          name: businessOwner
+          description: The Business Owner Body.
+          schema:
+            $ref: '#/definitions/BusinessOwnerRequestBody'
+      summary: Create a Business Owner on given request body.
+      description: Create a Business Owner on given request body.
+      operationId: createBusinessOwner()
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            type: object
+            properties:
+              businessOwnerId:
+                type: string
+                description: Business Owner Unique Identifier
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        404:
+          description: Not Found.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+  /metadata:
+    get:
+      parameters:
+        - $ref: '#/parameters/metadataId'
+        - $ref: '#/parameters/uuid'
+        - $ref: '#/parameters/filename'
+      summary: Retrieve the Metadata on given query parameters.
+      description: Retrieve the Metadata on given query parameters.
+      operationId: getMetadata()
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: "#/definitions/Metadata"
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        404:
+          description: Not Found.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+    post:
+      parameters:
+        - in: body
+          required: true
+          name: metatadata
+          schema:
+            $ref: '#/definitions/MetadataRequestBody'
+      summary: Create a new Metadata on request body.
+      description: Create a new Metadata on request body.
+      operationId: createMetadata()
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            type: object
+            properties:
+              metadataId:
+                type: string
+                description: Metadata Unique Identifier
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+  /metadata/{metadataId}:
+    put:
+      summary: Amend a Metadata on given metadataId.
+      description: Amend a Metadata on given metadataId.
+      operationId: amendMetadataByMetadataId()
+      parameters:
+        - name: metadataId
+          in: path
+          description: Metadata Owner Unique Identifier
+          type: string
+          required: true
+        - name: metadataBody
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/MetadataAmendBody'
+      responses:
+        200:
+          description: Successful response.
+        400:
+          description: Bad Request.
+          schema:
+            $ref: '#/definitions/Problem'
+        500:
+          description: Internal Server Error.
+          schema:
+            $ref: '#/definitions/Problem'
+        503:
+          description: Service Unavailable.
+          schema:
+            $ref: '#/definitions/Problem'
+parameters:
+  businessOwnerId:
+    name: businessOwnerId
+    in: path
+    required: true
+    type: string
+    maxLength: 255
+    description: Business Owner Unique Identifier
+  metadataId:
+    name: metadataId
+    in: query
+    required: false
+    type: string
+    maxLength: 255
+    description: Metadata Unique Identifier
+  uuid:
+    name: uuid
+    in: query
+    required: false
+    type: string
+    maxLength: 255
+    description: Metadata UUID
+  filename:
+    name: filename
+    in: query
+    required: false
+    type: string
+    maxLength: 255
+    description: Filename
+
+definitions:
+
+  BusinessOwner:
+    type: object
+    description: Business Owner
+    properties:
+      businessOwnerId:
+        type: string
+        description: Business Owner Unique Identifier
+      businessOwner:
+        type: string
+        description: Business Owner
+      startTime:
+        type: string
+        description: Start Time
+      endTime:
+        type: string
+        description: End time
+      gdpr:
+        type: boolean
+        description: Gdpr compliant
+      consent:
+        type: boolean
+        description: Consent compliant
+      active:
+        type: boolean
+        description: Business Owner soft deletion
+
+  BusinessOwnerAmendBody:
+    type: object
+    description: Business Owner Body
+    properties:
+      businessOwnerId:
+        type: string
+        description: Business Owner Unique Identifier
+      startTime:
+        type: string
+        description: Start Time
+      endTime:
+        type: string
+        description: End time
+      gdpr:
+        type: boolean
+        description: Gdpr compliant
+      consent:
+        type: boolean
+        description: Consent compliant
+
+  BusinessOwnerRequestBody:
+    type: object
+    description: Business Owner Body
+    properties:
+      businessOwner:
+        type: string
+        description: Business Owner
+      startTime:
+        type: string
+        description: Start Time
+      endTime:
+        type: string
+        description: End time
+      gdpr:
+        type: boolean
+        description: Gdpr compliant
+      consent:
+        type: boolean
+        description: Consent compliant
+  Metadata:
+    type: object
+    properties:
+      metadataId:
+        type: string
+        description: Metadata Unique Identifier.
+      uuid:
+        type: string
+        description: Metdata Name.
+      filename:
+        type: string
+        description: Filename.
+      mimeType:
+        type: string
+        description: Mime type.
+      path:
+        type: string
+        description: file path
+      size:
+        type: integer
+        format: int64
+        description: Size
+      status:
+        type: string
+        description: Metadata Status
+      businessOwner:
+        type: string
+        description: Business Owner
+      url:
+        type: string
+        description: Url
+      synopsises:
+        type: array
+        description: synopsis array
+        items:
+          type: object
+          properties:
+            synopsisId:
+              type: string
+              description: Synopsis Unique identifier
+            language:
+              type: string
+              description: Synopsis Language
+            synopsis:
+              type: string
+              description: Synopsis
+
+  MetadataRequestBody:
+    type: object
+    properties:
+      uuid:
+        type: string
+        description: Metadata name
+      filename:
+        type: string
+        description: Filename
+      size:
+        type: integer
+        format: int64
+        description: File size
+      mimeType:
+        type: string
+        description: Mime type
+      path:
+        type: string
+        description: HCP Path
+      businessOwner:
+        type: string
+        description: Business Owner
+      url:
+        type: string
+        description: URL
+      synopsises:
+        type: array
+        description: synopsis array
+        items:
+          type: object
+          properties:
+            language:
+              type: string
+              description: Synopsis Language
+            synopsis:
+              type: string
+              description: Synopsis
+
+  MetadataAmendBody:
+    type: object
+    properties:
+      metadataId:
+        type: string
+        description: Metadata Unique Identifier
+      status:
+        type: string
+        description: Metadata Status
+
+  Problem:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: HTTP Code
+        format: int64
+      type:
+        type: string
+        description: Error message code
+        maxLength: 255
+      title:
+        type: string
+        description: Error Description
+        maxLength: 255

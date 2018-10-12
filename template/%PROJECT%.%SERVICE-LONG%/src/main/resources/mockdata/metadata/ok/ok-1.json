@@ -1,0 +1,20 @@
+{
+  "metadataId": "1",
+  "metadataName": "metadata_ok-1",
+  "filename": "ok-1.json",
+  "mimeType": "json",
+  "path": "/path/to/the/file/ok-1.json",
+  "size": 0,
+  "synopsises": [
+    {
+      "synopsisId": "1",
+      "language": "fr",
+      "synopsis": "Ceci est un synopsis."
+    },
+    {
+      "synopsisId": "1",
+      "language": "en",
+      "synopsis": "This is a synopsis."
+    }
+  ]
+}

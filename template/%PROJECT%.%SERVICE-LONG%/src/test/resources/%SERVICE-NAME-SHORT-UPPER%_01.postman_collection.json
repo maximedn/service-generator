@@ -1,0 +1,232 @@
+{
+	"info": {
+		"_postman_id": "3ba58708-0cd9-4d0f-9d36-d6f3c1b4d1ef",
+		"name": "%SERVICE-NAME-SHORT-UPPER%_01",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET_METADATA",
+			"item": [
+				{
+					"name": "200",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9c93be6d-75d6-4950-abeb-4fc9819aa07a",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Payload is correct\", function() {",
+									"    pm.response.to.have.jsonBody('metadataId', '1')",
+									"    pm.response.to.have.jsonBody('metadataName', 'metadata_ok-1')",
+									"})"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{basePath}}/%PROJECT%/%SERVICE-SHORT-1W%/metadata?filename=ok-1.json",
+							"host": [
+								"{{basePath}}"
+							],
+							"path": [
+								"%PROJECT%",
+								"%SERVICE-SHORT-1W%",
+								"metadata"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "ok-1.json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "400 - filename too long",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6e4f64f0-a873-4ff5-b00b-f0d6db51798a",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400\", function() {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Payload is correct\", function() {",
+									"    pm.response.to.have.jsonBody('status', 400);",
+									"    pm.response.to.have.jsonBody('title', \"filename - arg0 is not correct: size must be between 0 and 255\");",
+									"    pm.response.to.have.jsonBody('instance', \"getMetadataByFilename_\");",
+									"",
+									"})"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{basePath}}/%PROJECT%/%SERVICE-SHORT-1W%/metadata?filename=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+							"host": [
+								"{{basePath}}"
+							],
+							"path": [
+								"%PROJECT%",
+								"%SERVICE-SHORT-1W%",
+								"metadata"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "500 - Exception at runtime",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f16df0f4-57ea-4cf1-b893-945297efb0db",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 500\", function() {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"Payload is correct\", function() {",
+									"    pm.response.to.have.jsonBody('status', 500);",
+									"    pm.response.to.have.jsonBody('title', \"An internal error occured.\");",
+									"    pm.response.to.have.jsonBody('detail', \"Mocked error: Error while getting metadata: you are not eligible.\");",
+									"})"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{basePath}}/%PROJECT%/%SERVICE-SHORT-1W%/metadata?filename=ko-1.json",
+							"host": [
+								"{{basePath}}"
+							],
+							"path": [
+								"%PROJECT%",
+								"%SERVICE-SHORT-1W%",
+								"metadata"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "ko-1.json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "404 - CitizenNumber not found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "16fb5dbf-dc26-4b40-bb29-6b348a09c6f4",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Payload is correct\", function() {",
+									"    pm.response.to.have.jsonBody('status', 404);",
+									"    pm.response.to.have.jsonBody('detail', \"filename=not-found.txt\");",
+									"    pm.response.to.have.jsonBody('instance', \"http://localhost:8080/%PROJECT%/%SERVICE-SHORT-1W%/metadata\");",
+									"})"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{basePath}}/%PROJECT%/%SERVICE-SHORT-1W%/metadata?filename=not-found.txt",
+							"host": [
+								"{{basePath}}"
+							],
+							"path": [
+								"%PROJECT%",
+								"%SERVICE-SHORT-1W%",
+								"metadata"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "not-found.txt"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "660eec87-8f57-422d-ab7c-5c7d329183e1",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "cb59f63b-69cf-40b2-a05e-db70907b962a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
